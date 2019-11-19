@@ -1,2 +1,2 @@
 # CMP.Logging
-Opinionated logging setup for .NET and Service Fabric
+Opinionated logging setup for .NET Core and Service Fabric
