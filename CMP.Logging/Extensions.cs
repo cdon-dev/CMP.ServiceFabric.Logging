@@ -9,7 +9,7 @@ using Serilog.Exceptions;
 using System;
 using System.Fabric;
 
-namespace CMP.Logging
+namespace CMP.ServiceFabric.Logging
 {
     public static class Extensions
     {
