@@ -17,6 +17,8 @@ All helper currently setup SeriLog global logger. If you just want a SeriLogger,
 
 ### Serilog only
 
-  Log.Logger = new LoggerConfiguration()
+  
+    Log.Logger = new LoggerConfiguration()
         .DefaultCmp(telemetryConfig, environment)
         .CreateLogger();
+
