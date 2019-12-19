@@ -32,20 +32,23 @@ namespace CMP.ServiceFabric.Logging
         this ServiceContext context,
         TelemetryConfiguration telemetryConfiguration,
         string environment,
+        string logCategoryName,
         bool dependencyLoggingEnabled = true)
             => telemetryConfiguration.ConfigureLogging(environment, config => config.TelemetryInitializers.Add(
-                FabricTelemetryInitializerExtension.CreateFabricTelemetryInitializer(context)), dependencyLoggingEnabled);
+                FabricTelemetryInitializerExtension.CreateFabricTelemetryInitializer(context)), logCategoryName, dependencyLoggingEnabled);
 
         public static Microsoft.Extensions.Logging.ILogger ConfigureLogging(
             this TelemetryConfiguration telemetryConfiguration,
             string environment,
+            string logCategoryName,
             bool dependencyLoggingEnabled = true)
-                => ConfigureLogging(telemetryConfiguration, environment, config => { }, dependencyLoggingEnabled);
+                => ConfigureLogging(telemetryConfiguration, environment, config => { }, logCategoryName, dependencyLoggingEnabled);
 
         public static Microsoft.Extensions.Logging.ILogger ConfigureLogging(
             this TelemetryConfiguration telemetryConfiguration,
             string environment,
             Action<TelemetryConfiguration> additionalConfig,
+            string logCategoryName,
             bool dependencyLoggingEnabled = true)
         {
             if (string.IsNullOrWhiteSpace(telemetryConfiguration.InstrumentationKey))
@@ -68,7 +71,7 @@ namespace CMP.ServiceFabric.Logging
 
             var logger = new LoggerFactory()
                 .AddSerilog(seriLogger)
-                .CreateLogger("CMP.Logging"); //TODO fix
+                .CreateLogger(logCategoryName);
 
             Log.Logger = seriLogger;
 

@@ -5,13 +5,13 @@ Opinionated logging setup for .NET Core and Service Fabric.
 
 ### Service Fabric Context
 
-    var logger = context.ConfigureLogging(telemetryConfiguration, environment);
+    var logger = context.ConfigureLogging(telemetryConfiguration, environment, "LogName");
 
 ### Telemetry Client
 
     var telemetryConfig = TelemetryConfiguration.CreateDefault();
     telemetryConfig.InstrumentationKey = config["ApplicationInsights:InstrumentationKey"];
-    var logger = telemetryConfig.ConfigureLogging(environment, dependencyLoggingEnabled: true);
+    var logger = telemetryConfig.ConfigureLogging(environment, "LogName" ,dependencyLoggingEnabled: true);
 
 All helper currently setup SeriLog global logger. If you just want a SeriLogger, use the following.
 
