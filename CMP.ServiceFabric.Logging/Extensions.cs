@@ -18,7 +18,9 @@ namespace CMP.ServiceFabric.Logging
             TelemetryConfiguration telemetryConfiguration,
             string env)
         {
-            var level = env == EnvironmentName.Production ? LogEventLevel.Information : LogEventLevel.Debug;
+            var level = string.Equals(env, EnvironmentName.Development, StringComparison.OrdinalIgnoreCase)
+                ? LogEventLevel.Debug
+                : LogEventLevel.Information;
             return loggerConfiguration
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
