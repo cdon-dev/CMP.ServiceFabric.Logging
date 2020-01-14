@@ -52,7 +52,7 @@ namespace CMP.ServiceFabric.Logging
             bool dependencyLoggingEnabled = true)
         {
             if (string.IsNullOrWhiteSpace(telemetryConfiguration.InstrumentationKey))
-                throw new ArgumentNullException("InstrumentationKey required");
+                throw new ArgumentNullException(nameof(telemetryConfiguration), "InstrumentationKey required");
 
             if (dependencyLoggingEnabled)
             {
