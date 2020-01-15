@@ -1,4 +1,6 @@
-﻿using Microsoft.ApplicationInsights.DependencyCollector;
+﻿using System;
+using System.Fabric;
+using Microsoft.ApplicationInsights.DependencyCollector;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.ServiceFabric;
 using Microsoft.AspNetCore.Hosting;
@@ -6,8 +8,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
-using System;
-using System.Fabric;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace CMP.ServiceFabric.Logging
 {
@@ -18,7 +19,10 @@ namespace CMP.ServiceFabric.Logging
             TelemetryConfiguration telemetryConfiguration,
             string env)
         {
-            var level = env == EnvironmentName.Production ? LogEventLevel.Information : LogEventLevel.Debug;
+            var level = string.Equals(env, EnvironmentName.Development, StringComparison.OrdinalIgnoreCase)
+                ? LogEventLevel.Debug
+                : LogEventLevel.Information;
+
             return loggerConfiguration
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
@@ -28,31 +32,40 @@ namespace CMP.ServiceFabric.Logging
                 .Enrich.WithExceptionDetails();
         }
 
-        public static Microsoft.Extensions.Logging.ILogger ConfigureLogging(
-        this ServiceContext context,
-        TelemetryConfiguration telemetryConfiguration,
-        string environment,
-        string logCategoryName,
-        bool dependencyLoggingEnabled = true)
-            => telemetryConfiguration.ConfigureLogging(environment, config => config.TelemetryInitializers.Add(
-                FabricTelemetryInitializerExtension.CreateFabricTelemetryInitializer(context)), logCategoryName, dependencyLoggingEnabled);
-
-        public static Microsoft.Extensions.Logging.ILogger ConfigureLogging(
-            this TelemetryConfiguration telemetryConfiguration,
-            string environment,
+        public static ILogger ConfigureLogging(
+            this ServiceContext context,
+            TelemetryConfiguration telemetryConfiguration,
+            Serilog.ILogger serilogLogger,
             string logCategoryName,
             bool dependencyLoggingEnabled = true)
-                => ConfigureLogging(telemetryConfiguration, environment, config => { }, logCategoryName, dependencyLoggingEnabled);
+            => telemetryConfiguration.ConfigureLogging(
+                serilogLogger,
+                config => config.TelemetryInitializers.Add(
+                    FabricTelemetryInitializerExtension.CreateFabricTelemetryInitializer(context)),
+                logCategoryName,
+                dependencyLoggingEnabled);
 
-        public static Microsoft.Extensions.Logging.ILogger ConfigureLogging(
+        public static ILogger ConfigureLogging(
             this TelemetryConfiguration telemetryConfiguration,
-            string environment,
+            Serilog.ILogger serilogLogger,
+            string logCategoryName,
+            bool dependencyLoggingEnabled = true)
+            => ConfigureLogging(
+                telemetryConfiguration,
+                serilogLogger,
+                config => { },
+                logCategoryName,
+                dependencyLoggingEnabled);
+
+        public static ILogger ConfigureLogging(
+            this TelemetryConfiguration telemetryConfiguration,
+            Serilog.ILogger serilogLogger,
             Action<TelemetryConfiguration> additionalConfig,
             string logCategoryName,
             bool dependencyLoggingEnabled = true)
         {
             if (string.IsNullOrWhiteSpace(telemetryConfiguration.InstrumentationKey))
-                throw new ArgumentNullException("InstrumentationKey required");
+                throw new ArgumentNullException(nameof(telemetryConfiguration), "InstrumentationKey required");
 
             if (dependencyLoggingEnabled)
             {
@@ -65,15 +78,9 @@ namespace CMP.ServiceFabric.Logging
 
             additionalConfig(telemetryConfiguration);
 
-            var seriLogger = new LoggerConfiguration()
-                .DefaultCmp(telemetryConfiguration, environment)
-                .CreateLogger();
-
             var logger = new LoggerFactory()
-                .AddSerilog(seriLogger)
+                .AddSerilog(serilogLogger)
                 .CreateLogger(logCategoryName);
-
-            Log.Logger = seriLogger;
 
             return logger;
         }
