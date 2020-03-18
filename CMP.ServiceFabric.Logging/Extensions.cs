@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Fabric;
-using Microsoft.ApplicationInsights.DependencyCollector;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.ServiceFabric;
 using Microsoft.AspNetCore.Hosting;
@@ -42,8 +41,7 @@ namespace CMP.ServiceFabric.Logging
                 serilogLogger,
                 config => config.TelemetryInitializers.Add(
                     FabricTelemetryInitializerExtension.CreateFabricTelemetryInitializer(context)),
-                logCategoryName,
-                dependencyLoggingEnabled);
+                logCategoryName);
 
         public static ILogger ConfigureLogging(
             this TelemetryConfiguration telemetryConfiguration,
@@ -54,27 +52,16 @@ namespace CMP.ServiceFabric.Logging
                 telemetryConfiguration,
                 serilogLogger,
                 config => { },
-                logCategoryName,
-                dependencyLoggingEnabled);
+                logCategoryName);
 
         public static ILogger ConfigureLogging(
             this TelemetryConfiguration telemetryConfiguration,
             Serilog.ILogger serilogLogger,
             Action<TelemetryConfiguration> additionalConfig,
-            string logCategoryName,
-            bool dependencyLoggingEnabled = true)
+            string logCategoryName)
         {
             if (string.IsNullOrWhiteSpace(telemetryConfiguration.InstrumentationKey))
                 throw new ArgumentNullException(nameof(telemetryConfiguration), "InstrumentationKey required");
-
-            if (dependencyLoggingEnabled)
-            {
-                var module = new DependencyTrackingTelemetryModule();
-                module.IncludeDiagnosticSourceActivities.Add("Microsoft.Azure.ServiceBus");
-                module.IncludeDiagnosticSourceActivities.Add("Microsoft.Azure.EventHubs");
-
-                module.Initialize(telemetryConfiguration);
-            }
 
             additionalConfig(telemetryConfiguration);
 
