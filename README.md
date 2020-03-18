@@ -19,7 +19,7 @@ var logger = context.ConfigureLogging(telemetryConfig, serilogLogger, "LogName")
 ```csharp
 var telemetryConfig = TelemetryConfiguration.CreateDefault();
 telemetryConfig.InstrumentationKey = config["ApplicationInsights:InstrumentationKey"];
-var logger = telemetryConfig.ConfigureLogging(serilogLogger, "LogName", dependencyLoggingEnabled: true);
+var logger = telemetryConfig.ConfigureLogging(serilogLogger, "LogName");
 ```
 
 ### Serilog only
