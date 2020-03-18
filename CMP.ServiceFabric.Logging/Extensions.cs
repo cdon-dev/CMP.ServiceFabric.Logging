@@ -35,8 +35,7 @@ namespace CMP.ServiceFabric.Logging
             this ServiceContext context,
             TelemetryConfiguration telemetryConfiguration,
             Serilog.ILogger serilogLogger,
-            string logCategoryName,
-            bool dependencyLoggingEnabled = true)
+            string logCategoryName)
             => telemetryConfiguration.ConfigureLogging(
                 serilogLogger,
                 config => config.TelemetryInitializers.Add(
@@ -46,8 +45,7 @@ namespace CMP.ServiceFabric.Logging
         public static ILogger ConfigureLogging(
             this TelemetryConfiguration telemetryConfiguration,
             Serilog.ILogger serilogLogger,
-            string logCategoryName,
-            bool dependencyLoggingEnabled = true)
+            string logCategoryName)
             => ConfigureLogging(
                 telemetryConfiguration,
                 serilogLogger,
