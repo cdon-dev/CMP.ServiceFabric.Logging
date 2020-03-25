@@ -3,6 +3,8 @@ using System;
 using CMP.ServiceFabric.Logging;
 using Microsoft.ApplicationInsights.Extensibility;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace ConsoleSample
 {
@@ -10,16 +12,25 @@ namespace ConsoleSample
     {
         static void Main(string[] args)
         {
-            var telemetryConfig = TelemetryConfiguration.CreateDefault();
-            telemetryConfig.InstrumentationKey = args.First();
+            var instrumentationKey = args.First();
 
-            var serilogLogger = new LoggerConfiguration()
-                .DefaultCmp(telemetryConfig, "development")
+            var serviceProvider = new ServiceCollection()
+              .AddApplicationInsightsTelemetryWorkerService(instrumentationKey)
+              .AddApplicationInsightsTelemetryProcessor<SuccessfulDependencyFilter>()
+              .BuildServiceProvider();
+
+            var telemetryConfiguration = serviceProvider.GetRequiredService<TelemetryConfiguration>();
+
+            var seriLogger = new LoggerConfiguration()
+                .DefaultCmp(telemetryConfiguration, "development")
                 .CreateLogger();
-            
-            Log.Logger = serilogLogger;
+            Log.Logger = seriLogger;
+
+            var coreLogger = telemetryConfiguration.ConfigureLogging(Log.Logger, "ConsoleSample");
+            //NOTE in SF: coreLogger = context.ConfigureLogging(telemetryConfiguration, Log.Logger, "ConsoleSample");
 
             Console.WriteLine("Hello World!");
+            coreLogger.LogInformation("Hello world");
         }
     }
 }

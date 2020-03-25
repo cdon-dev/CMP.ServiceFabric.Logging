@@ -9,4 +9,8 @@
     <ProjectReference Include="..\..\CMP.ServiceFabric.Logging\CMP.ServiceFabric.Logging.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.13.1" />
+  </ItemGroup>
+
 </Project>
