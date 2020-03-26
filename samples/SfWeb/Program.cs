@@ -27,6 +27,9 @@ namespace SfWeb
                 ServiceRuntime.RegisterServiceAsync("SfWebType",
                     context =>
                     {
+                        //TODO this only adds a initializer (SF)
+                        //to the create core ILogger....(what about Log.Logger)
+                        //and resolved ILogger (both) - this is not in IoC
                         context.ConfigureLogging(telemetryConfiguration, Log.Logger, "SfWebType");
                         return new SfWeb(context);
                     }).GetAwaiter().GetResult();
