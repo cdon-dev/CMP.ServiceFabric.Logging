@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace SfWeb
 {
@@ -29,6 +26,8 @@ namespace SfWeb
         {
             //NOTE : https://github.com/MicrosoftDocs/azure-docs/issues/27395#issuecomment-473767218
             services.AddApplicationInsightsTelemetry(_configuration);
+            services.AddRouting();
+            services.AddLogging();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,11 +44,10 @@ namespace SfWeb
             {
                 endpoints.MapGet("/", async context =>
                 {
-                    var seriLogger = context.RequestServices.GetRequiredService<Serilog.ILogger>();
-                    var coreLogger = context.RequestServices.GetRequiredService<ILogger>();
+                    var coreLoggerFactory = context.RequestServices.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>();
 
-                    seriLogger.Information("Serilog Logger - Hello World");
-                    coreLogger.LogInformation(".NET Core Logger - Hello World");
+                    Log.Logger.Information("Serilog Logger - Hello World");
+                    coreLoggerFactory.CreateLogger("Starup").LogInformation(".NET Core Logger - Hello World");
                     await context.Response.WriteAsync("Hello World!");
                 });
             });

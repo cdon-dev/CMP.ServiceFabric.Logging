@@ -33,10 +33,10 @@ namespace SfWorker
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-
-                ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
-                Log.Logger.Information("Serilog Logger Working-{0}", ++iterations);
-                this.logger.LogInformation(".NET Core Logger Working-{0}", ++iterations);
+                ++iterations;
+                ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", iterations);
+                Log.Logger.Information("Serilog Logger Working-{0}", iterations);
+                this.logger.LogInformation(".NET Core Logger Working-{0}", iterations);
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }
         }
