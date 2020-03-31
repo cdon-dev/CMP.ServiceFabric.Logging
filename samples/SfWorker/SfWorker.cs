@@ -13,9 +13,9 @@ namespace SfWorker
 {
     internal sealed class SfWorker : StatelessService
     {
-        private readonly ILogger logger;
+        private readonly Microsoft.Extensions.Logging.ILogger logger;
 
-        public SfWorker(StatelessServiceContext context, ILogger logger)
+        public SfWorker(StatelessServiceContext context, Microsoft.Extensions.Logging.ILogger logger)
             : base(context)
         {
             this.logger = logger;
