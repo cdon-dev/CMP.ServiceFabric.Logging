@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using Serilog;
 
 namespace SfWorker
 {
@@ -34,7 +35,8 @@ namespace SfWorker
                 cancellationToken.ThrowIfCancellationRequested();
 
                 ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
-                this.logger.LogInformation("Working-{0}", ++iterations);
+                Log.Logger.Information("Serilog Logger Working-{0}", ++iterations);
+                this.logger.LogInformation(".NET Core Logger Working-{0}", ++iterations);
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }
         }
